@@ -44,7 +44,7 @@ huggingface-cli login --token "${your_hf_token}"
 ```
 4. Set the environment variable DATA_DIR and download pre-trained model weights from huggingface into `../models`. For example,
 ```
-huggingface-cli download meta-llama/Llama-2-7b-hf --local-dir ../models/Llama-3.2-3B-Instruct
+huggingface-cli download meta-llama/Llama-3.2-3B-Instruct --local-dir ../models/Llama-3.2-3B-Instruct
 ```
 ## Step 1: Generate solutions
 The first step of CLLR is to generate solutions for each question in the training set using an LLM. The parameters used for generation are stored in `config/generation.yaml`.
