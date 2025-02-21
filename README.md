@@ -1,3 +1,4 @@
+<!--
 # DPO-ST: DPO-augmented Self-Training
 
 This repository contains the official code and data for our ACL 2024 paper [Self-Training with Direct Preference Optimization Improves Chain-of-Thought Reasoning](https://arxiv.org/abs/2407.18248).
@@ -24,14 +25,14 @@ Specifically, we design a [LogitsProcessor](https://huggingface.co/docs/transfor
     <img src="images/calc.png" width="55%"> <br>
     Inference speed-up comparison with Flan-T5-Large on a single A40 GPU.
 </p>
-
+-->
 
 ## Setup
 Please follow the following steps before running our code.
 1. Use Conda to create a Python virtual environment:
 ```
-conda create -n dpo-st python=3.10
-conda activate dpo-st
+conda create -n CLLR python=3.12 -y
+conda activate CLLR
 ```
 2. Install the Python dependencies with pip.
 ```
@@ -41,16 +42,23 @@ pip install requirements.txt
 ```
 huggingface-cli login --token "${your_hf_token}"
 ```
-4. Set the environment variable DATA_DIR and download pre-trained model weights from huggingface into `DATA_DIR/hf_models`. For example,
+4. Set the environment variable DATA_DIR and download pre-trained model weights from huggingface into `../models`. For example,
 ```
-DATA_DIR='.'
-huggingface-cli download meta-llama/Llama-2-7b-hf --local-dir DATA_DIR/hf_models/llama-2
+huggingface-cli download meta-llama/Llama-2-7b-hf --local-dir ../models/Llama-3.2-3B-Instruct
 ```
+## Step 1: Generate solutions
+The first step of CLLR is to generate solutions for each question in the training set using an LLM. The parameters used for generation are stored in `config/generation.yaml`.
+
+```bash
+python vllm_gene.py --config-name=generation
+```
+
+<!--
 We recommend using [python-dotenv](https://pypi.org/project/python-dotenv/)
 to define the `DATA_DIR` in to your `.env` file
 as this environment variable will be used in the subsequent steps.
-
-
+-->
+<!--
 ## Step 1: Warm-up
 The first step of DPO-ST is to warm-up the pre-trained language model by fine-tuning it on the labeled dataset.
 
@@ -137,3 +145,4 @@ If you find this paper useful, please consider citing it
 
 ## Acknowledgement
 This repo is largely inspired by [GSM8K-ScRel](https://github.com/OFA-Sys/gsm8k-ScRel) and [TRL](https://github.com/huggingface/trl). We are grateful to the authors for their brilliant work.
+-->
