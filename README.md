@@ -36,7 +36,7 @@ conda activate CLLR
 ```
 2. Install the Python dependencies with pip.
 ```
-pip install requirements.txt
+pip install -r requirements.txt
 ```
 3. Loggin to huggingface for downloading pre-trained model weights
 ```
@@ -44,7 +44,7 @@ huggingface-cli login --token "${your_hf_token}"
 ```
 4. Set the environment variable DATA_DIR and download pre-trained model weights from huggingface into `../models`. For example,
 ```
-huggingface-cli download meta-llama/Llama-3.2-3B-Instruct --local-dir ../models/Llama-3.2-3B-Instruct
+huggingface-cli download Qwen/Qwen2.5-3B-Instruct --local-dir ../models/Qwen2.5-3B-Instruct
 ```
 ## Step 1: Generate solutions
 The first step of CLLR is to generate solutions for each question in the training set using an LLM. The parameters used for generation are stored in `config/generation.yaml`.

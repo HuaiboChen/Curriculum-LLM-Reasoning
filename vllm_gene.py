@@ -2,30 +2,40 @@ from vllm import LLM, SamplingParams
 import json
 from typing import List
 from tqdm import tqdm
+from datasets import load_dataset
+import hydra
+from omegaconf import DictConfig
 
 
 def prepare_prompts(input_file: str, batch_size: int = 32) -> List[List[str]]:
     """Load prompts from file and create batches"""
-    with open(input_file, 'r') as f:
-        prompts = [line.strip() for line in f]
-    
-    # Create batches
+    dataset = load_dataset('json', data_files=input_file)['train']
+    prompts = [item['question'] for item in dataset]
     return [prompts[i:i + batch_size] for i in range(0, len(prompts), batch_size)]
 
-def generate_responses(prompt_batches: List[List[str]], output_file: str, n_responses: int = 3):
-    """Generate multiple responses for batches of prompts"""
+@hydra.main(version_base=None, config_path="config", config_name="generation")
+def main(cfg: DictConfig):
+    input_file = cfg.data.input_file
+    output_file = cfg.data.results_file
+    batch_size = cfg.data.batch_size
+    n_responses = cfg.generation.n_responses
+    
+    prompt_batches = prepare_prompts(input_file, batch_size)
+    
     sampling_params = SamplingParams(
-        temperature=0.7,
-        top_p=0.9,
-        max_tokens=512,
-        n=n_responses,  # Generate multiple responses per prompt
+        temperature=cfg.generation.temperature,
+        top_p=cfg.generation.top_p,
+        max_tokens=cfg.generation.max_tokens,
+        n=n_responses,
     )
+    
     model = LLM(
-        model="Qwen/Qwen2.5-3B-Instruct",
-        tensor_parallel_size=4,
-        trust_remote_code=True,
-        dtype="float16",
+        model=cfg.model.name,
+        tensor_parallel_size=cfg.model.tensor_parallel_size,
+        trust_remote_code=cfg.model.trust_remote_code,
+        dtype=cfg.model.dtype,
     )
+    
     with open(output_file, 'w') as f:
         for batch_idx, batch in enumerate(tqdm(prompt_batches)):
             outputs = model.generate(batch, sampling_params)
@@ -34,15 +44,9 @@ def generate_responses(prompt_batches: List[List[str]], output_file: str, n_resp
             for output in outputs:
                 result = {
                     'prompt': output.prompt,
-                    'generated_texts': [out.text for out in output.outputs],  # Save all responses
+                    'generated_texts': [out.text for out in output.outputs],
                 }
                 f.write(json.dumps(result) + '\n')
 
-
 if __name__ == "__main__":
-    input_file = "prompts.txt"
-    output_file = "responses.jsonl"
-    batch_size = 32
-    n_responses = 3  # Number of responses to generate per prompt
-    prompt_batches = prepare_prompts(input_file, batch_size)
-    generate_responses(prompt_batches, output_file, n_responses)
+    main()

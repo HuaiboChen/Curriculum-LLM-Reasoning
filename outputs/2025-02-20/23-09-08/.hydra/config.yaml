@@ -1,0 +1,14 @@
+model:
+  name: ../models/Qwen2.5-3B-Instruct
+  tensor_parallel_size: 1
+  trust_remote_code: true
+  dtype: float16
+generation:
+  temperature: 0.7
+  top_p: 0.9
+  max_tokens: 512
+  n_responses: 3
+data:
+  input_file: gsm8k/train.jsonl
+  results_file: responses.jsonl
+  batch_size: 32
